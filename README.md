@@ -72,7 +72,7 @@ Tested with v6.6, v7.6 and v8.9
 
 (The MIT License)
 
-Copyright (c) 2018 [Sylvain Leroux](sylvain@chicoree.fr)
+Copyright (c) 2018 [Sylvain Leroux](mailto:sylvain@chicoree.fr)
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
