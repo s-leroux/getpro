@@ -1,6 +1,7 @@
 const debug = require("debug")("getpro:tests");
 
 const Promise = require("bluebird");
+const MemoryStream = require('memorystream');
 const assert = require('chai').assert;
 
 const HTTP_TEST_SERVER = process.env.HTTP_TEST_SERVER || "httpbin.org";
@@ -35,6 +36,20 @@ describe("module", function() {
                   // assert.equal(buffer.length, res.headers['content-length']); // can't be true because of multi-byte encoding
                   resolve();
                 });
+              }));
+          });
+
+          it("should stream", function() {
+            const SIZE = 2048;
+            let memStream = MemoryStream.createWriteStream();
+            
+            return gp.get(BASE+'/stream-bytes/'+SIZE)
+              .then((res) => new Promise(function(resolve, reject) {
+                res.pipe(memStream)
+                  .on('finish', () => {
+                    assert.equal(memStream.toBuffer().length, SIZE);
+                    resolve();
+                  });
               }));
           });
 
