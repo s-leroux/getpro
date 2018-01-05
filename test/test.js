@@ -21,7 +21,7 @@ describe("module", function() {
     for(let protocol of ["http", "https"]) {
       describe(protocol.toUpperCase(), function() {
         const BASE = protocol + "://" + HTTP_TEST_SERVER;
-        
+
         describe("GET", function() {
           this.timeout(HTTP_SERVER_TIMEOUT); // extends timeout since we are using an external service
           gp = require("../index.js");
@@ -42,7 +42,7 @@ describe("module", function() {
           it("should stream", function() {
             const SIZE = 2048;
             let memStream = MemoryStream.createWriteStream();
-            
+
             return gp.get(BASE+'/stream-bytes/'+SIZE)
               .then((res) => new Promise(function(resolve, reject) {
                 res.pipe(memStream)
@@ -56,7 +56,7 @@ describe("module", function() {
           it("should follow redirects", function() {
             const REDIRECTS = 5;
             this.timeout(REDIRECTS*HTTP_SERVER_TIMEOUT);
-            
+
             return gp.get(BASE+'/redirect/'+REDIRECTS)
               .then((res) => new Promise(function(resolve, reject) {
                 let length = 0;
@@ -71,7 +71,7 @@ describe("module", function() {
 
           it("should support chunked encoding", function() {
             const SIZE = 2048;
-            
+
             return gp.get(BASE+'/stream-bytes/'+SIZE)
               .then((res) => new Promise(function(resolve, reject) {
                 let length = 0;
@@ -84,11 +84,11 @@ describe("module", function() {
               }));
             });
 
-          it("should implement consume", function() {            
+          it("should implement consume", function() {
             return gp.get(BASE+'/encoding/utf8')
               .then(Promise.coroutine(function*(res) {
                 let chunk = null;
-                
+
                 while (chunk = yield res.consume()) {
                   debug("chunk len=%d", chunk.length);
                 };
@@ -102,17 +102,17 @@ describe("module", function() {
             return gp.get(BASE+'/stream-bytes/'+SIZE)
               .then(Promise.coroutine(function*(res) {
                 let chunk = null;
-                
+
                 while (chunk = yield res.consume()) {
                   length += chunk.length;
                   debug("chunk len=%d", chunk.length);
                 };
-                
+
                 assert.equal(length, SIZE);
               }));
           });
 
         });
-      });  
+      });
     }
 });
