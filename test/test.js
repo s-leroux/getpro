@@ -1,6 +1,7 @@
 const assert = require('chai').assert;
 
 const HTTP_TEST_SERVER = process.env.HTTP_TEST_SERVER || "http://httpbin.org";
+const HTTP_SERVER_TIMEOUT = process.env.HTTP_SERVER_TIMEOUT || 5000;
 
 describe("module", function() {
     let gp = null;
@@ -14,7 +15,7 @@ describe("module", function() {
     });
 
     describe("HTTP GET", function() {
-      this.timeout(5000); // extends timeout since we are using an external service
+      this.timeout(HTTP_SERVER_TIMEOUT); // extends timeout since we are using an external service
       gp = require("../index.js");
 
       it("should load text", function() {
@@ -31,7 +32,10 @@ describe("module", function() {
       });
 
       it("should follow redirects", function() {
-        return gp.get(HTTP_TEST_SERVER+'/redirect/5')
+        const REDIRECTS = 5;
+        this.timeout(REDIRECTS*HTTP_SERVER_TIMEOUT);
+        
+        return gp.get(HTTP_TEST_SERVER+'/redirect/'+REDIRECTS)
           .then((res) => new Promise(function(resolve, reject) {
             let length = 0;
             res.on('data', (chunk) => length += chunk.length);
