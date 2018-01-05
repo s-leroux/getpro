@@ -1,6 +1,6 @@
 const assert = require('chai').assert;
 
-const HTTP_TEST_SERVER = process.env.TTTP_TEST_SERVER || "http://httpbin.org";
+const HTTP_TEST_SERVER = process.env.HTTP_TEST_SERVER || "http://httpbin.org";
 
 describe("module", function() {
     let gp = null;
