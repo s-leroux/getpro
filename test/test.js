@@ -5,6 +5,9 @@ const MemoryStream = require('memorystream');
 const assert = require('chai').assert;
 const semver = require('semver');
 
+/* temporary patch for https://github.com/chaijs/chai/issues/1116 */
+assert.fail = require('assert').fail;
+
 const HTTP_TEST_SERVER = process.env.HTTP_TEST_SERVER || "httpbin.org";
 const HTTP_SERVER_TIMEOUT = process.env.HTTP_SERVER_TIMEOUT || 5000;
 
@@ -70,15 +73,26 @@ describe("module", function() {
               }));
           });
 
+          it("should limit redirects", function() {
+            const REDIRECTS = 50;
+            this.timeout(REDIRECTS*HTTP_SERVER_TIMEOUT);
+
+            return gp.get(BASE+'/redirect/'+REDIRECTS)
+              .then(
+                () => { assert.fail("Not supposed to succeed"); },
+                (err) => { debug(err); assert.equal(err.response.statusCode, 302); }
+              );
+          });
+
           it("should reject 4xx", function() {
             return gp.get(BASE+'/status/418')
-              .then(() => { throw("Not supposed to succeed"); })
+              .then(() => { assert.fail("Not supposed to succeed"); })
               .catch((err) => { assert.equal(err.response.statusCode, 418); })
           });
 
           it("should reject 5xx", function() {
             return gp.get(BASE+'/status/500')
-              .then(() => { throw("Not supposed to succeed"); })
+              .then(() => { assert.fail("Not supposed to succeed"); })
               .catch((err) => { assert.equal(err.response.statusCode, 500); })
           });
 
