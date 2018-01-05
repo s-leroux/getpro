@@ -1,3 +1,6 @@
+const debug = require("debug")("getpro:tests");
+
+const Promise = require("bluebird");
 const assert = require('chai').assert;
 
 const HTTP_TEST_SERVER = process.env.HTTP_TEST_SERVER || "httpbin.org";
@@ -65,6 +68,34 @@ describe("module", function() {
                 });
               }));
             });
+
+          it("should implement consume", function() {            
+            return gp.get(BASE+'/encoding/utf8')
+              .then(Promise.coroutine(function*(res) {
+                let chunk = null;
+                
+                while (chunk = yield res.consume()) {
+                  debug("chunk len=%d", chunk.length);
+                };
+              }));
+          });
+
+          it("should consume chunked encoding", function() {
+            const SIZE = 2048;
+            let length = 0;
+
+            return gp.get(BASE+'/stream-bytes/'+SIZE)
+              .then(Promise.coroutine(function*(res) {
+                let chunk = null;
+                
+                while (chunk = yield res.consume()) {
+                  length += chunk.length;
+                  debug("chunk len=%d", chunk.length);
+                };
+                
+                assert.equal(length, SIZE);
+              }));
+          });
 
         });
       });  
