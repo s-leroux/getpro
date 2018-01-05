@@ -50,6 +50,22 @@ describe("module", function() {
                 });
               }));
           });
+
+          it("should support chunked encoding", function() {
+            const SIZE = 2048;
+            
+            return gp.get(BASE+'/stream-bytes/'+SIZE)
+              .then((res) => new Promise(function(resolve, reject) {
+                let length = 0;
+                res.on('data', (chunk) => length += chunk.length);
+                res.on('end', () => {
+                  assert.equal(res.statusCode, 200);
+                  assert.equal(length, SIZE);
+                  resolve();
+                });
+              }));
+            });
+
         });
       });  
     }
