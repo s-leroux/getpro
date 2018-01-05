@@ -1,6 +1,6 @@
 {
   "name": "getpro",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": " A very simple promise-based npm package to get http/https documents",
   "main": "index.js",
   "scripts": {
