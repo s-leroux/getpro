@@ -1,5 +1,4 @@
 const assert = require('chai').assert;
-// const server = require("./server");
 
 const HTTP_TEST_SERVER = process.env.TTTP_TEST_SERVER || "http://httpbin.org";
 
@@ -17,11 +16,7 @@ describe("module", function() {
     describe("HTTP GET", function() {
       this.timeout(5000); // extends timeout since we are using an external service
       gp = require("../index.js");
-/*
-      before(function() {
-        server.listen(PORT);
-      });
-*/
+
       it("should load text", function() {
         return gp.get(HTTP_TEST_SERVER+'/encoding/utf8')
           .then((res) => new Promise(function(resolve, reject) {
@@ -47,12 +42,6 @@ describe("module", function() {
             });
           }));
       });
-
-/*
-      after(function() {
-        server.close();
-      });
-*/
     });
 
 });
