@@ -10,6 +10,23 @@ http/http.
 ## Installation
 
     npm install --save getpro
+    
+## Description
+
+`getpro` is designed for no-caching asynchronous promise-oriented file download
+over http/https.
+
+It (currently?) only supports the GET method.
+
+* promise-oriented
+* very little dependencies
+* follows 3xx redirections
+* reject promise in case of 4xx or 5xx response or error (no synchronous exceptions thrown)
+* supports the _stream_ interface (so you can `.pipe` data as fast as they arrive)
+* supports the _consumer_ interface to obtain a `Promise` that will be resolved
+when the next chuck of data arrives or when the stream is exhausted
+
+The _consumer_ interface integrates nicely with ECMAScript 2017 asynchronous functions (async/await) as well as with bluebird coroutines (see examples below).
 
 ## Usage
 
