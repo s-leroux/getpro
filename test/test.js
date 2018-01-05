@@ -3,6 +3,7 @@ const debug = require("debug")("getpro:tests");
 const Promise = require("bluebird");
 const MemoryStream = require('memorystream');
 const assert = require('chai').assert;
+const semver = require('semver');
 
 const HTTP_TEST_SERVER = process.env.HTTP_TEST_SERVER || "httpbin.org";
 const HTTP_SERVER_TIMEOUT = process.env.HTTP_SERVER_TIMEOUT || 5000;
@@ -41,7 +42,7 @@ describe("module", function() {
 
           it("should stream", function() {
             const SIZE = 2048;
-            let memStream = MemoryStream.createWriteStream();
+            const memStream = MemoryStream.createWriteStream();
 
             return gp.get(BASE+'/stream-bytes/'+SIZE)
               .then((res) => new Promise(function(resolve, reject) {
@@ -112,6 +113,10 @@ describe("module", function() {
               }));
           });
 
+          if (semver.satisfies(process.version, '>= 7.6.0')) {
+            require("./extra/async.js")(BASE, gp);
+          }
+          
         });
       });
     }

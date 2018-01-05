@@ -14,10 +14,42 @@ http/http.
 ## Usage
 
     const gp = require('getpro');
-    gp.get('http://example.com/image.png').then(that);
+    
+    // Stream interface
+    const fs = require('fs');
+    
+    gp.get('http://httpbin.org/encoding/utf8')
+      .then((res) => {
+        const output = fs.createWriteStream('/tmp/utf8');
+        res.pipe(output);
+      });
+      
+    // Consumer interface (bluebird coroutine)
+    const Promise = require('bluebird');
+    gp.get('http://httpbin.org/encoding/utf8')
+      .then(Promise.coroutine(function*(res) {
+        let chunk = null;
+
+        while (chunk = yield res.consume()) {
+          console.log(chunk);
+        };
+      }));
+
+      
+    // Consumer interface (ECMAScript 2017 (ECMA-262) async/await)
+    gp.get('http://httpbin.org/encoding/utf8')
+      .then(async function (res) {
+        let chunk = null;
+
+        while (chunk = await res.consume()) {
+          console.log(chunk);
+        };
+      });
+
+    
 
 ## Node version
-Tested with v6.6.0
+Tested with v6.6, v7.6 and v8.9
  
 ## License 
 
