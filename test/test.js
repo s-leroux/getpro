@@ -87,13 +87,13 @@ describe("module", function() {
           it("should reject 4xx", function() {
             return gp.get(BASE+'/status/418')
               .then(() => { assert.fail("Not supposed to succeed"); })
-              .catch((err) => { assert.equal(err.response.statusCode, 418); })
+              .catch((err) => { debug(err); assert.equal(err.response.statusCode, 418); })
           });
 
           it("should reject 5xx", function() {
             return gp.get(BASE+'/status/500')
               .then(() => { assert.fail("Not supposed to succeed"); })
-              .catch((err) => { assert.equal(err.response.statusCode, 500); })
+              .catch((err) => { debug(err); assert.equal(err.response.statusCode, 500); })
           });
 
           it("should reject 1xx [exotic]", function() {
