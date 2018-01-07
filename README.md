@@ -66,7 +66,8 @@ The _consumer_ interface integrates nicely with ECMAScript 2017 asynchronous fun
     
 
 ## Node version
-Tested with v6.6, v7.6 and v8.9
+Requires NodeJS >= v7.0
+Tested with v7.0, v7.6 and v8.9
  
 ## License 
 
