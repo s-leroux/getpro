@@ -145,6 +145,15 @@ describe("module", function() {
               }));
           });
 
+          it("should reject non-existant hosts", function(done) {
+            gp.get("https://xxxxxxx.yesik.it/index.html")
+              .then(assert.fail)
+              .catch(()=>{
+                done();
+              });
+          });
+
+
           if (semver.satisfies(process.version, '>= 7.6.0')) {
             require("./extra/async.js")(BASE, gp);
           }
