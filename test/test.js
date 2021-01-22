@@ -8,7 +8,7 @@ const semver = require('semver');
 /* temporary patch for https://github.com/chaijs/chai/issues/1116 */
 assert.fail = require('assert').fail;
 
-const HTTP_TEST_SERVER = process.env.HTTP_TEST_SERVER || "httpbin.org";
+const HTTP_TEST_SERVER = process.env.HTTP_TEST_SERVER || "httpbingo.org";
 const HTTP_SERVER_TIMEOUT = process.env.HTTP_SERVER_TIMEOUT || 5000;
 
 describe("module", function() {
