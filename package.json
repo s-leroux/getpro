@@ -4,7 +4,7 @@
   "description": " A very simple promise-based npm package to get http/https documents",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "node_modules/.bin/mocha"
   },
   "repository": {
     "type": "git",
