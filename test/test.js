@@ -25,22 +25,56 @@ describe("module", function() {
     for(let protocol of ["http", "https"]) {
       describe(protocol.toUpperCase(), function() {
         const BASE = protocol + "://" + HTTP_TEST_SERVER;
+        const TEXT = "Some random UTF-8 string ❤️ "
 
         describe("GET", function() {
           this.timeout(HTTP_SERVER_TIMEOUT); // extends timeout since we are using an external service
           gp = require("../index.js");
 
           it("should load text", function() {
+            let buffer = "";
             return gp.get(BASE+'/encoding/utf8')
               .then((res) => new Promise(function(resolve, reject) {
-                let buffer = "";
-                res.on('data', (chunk) => { assert.typeOf(chunk, 'string'); buffer+=chunk; });
-                res.on('end', () => {
-                  assert.isAbove(buffer.length, 0);
-                  // assert.equal(buffer.length, res.headers['content-length']); // can't be true because of multi-byte encoding
-                  resolve();
-                });
-              }));
+
+                res._node_res.on('error', (err) => reject(err));
+                res._node_res.on('data', (chunk) => { buffer+=chunk; });
+                res._node_res.on('end', () => resolve());
+              }))
+              .then(() => {
+                assert.isAbove(buffer.length, 0);
+                assert.match(buffer, /⡌⠁⠧⠑ ⠼⠁⠒  ⡍⠜⠇⠑⠹⠰⠎ ⡣⠕⠌/);
+              });
+          });
+
+          it("should implement the data interface (stream of bytes)", async function() {
+            const SIZE = 2048;
+
+            const res = await gp.get(BASE+'/stream-bytes/'+SIZE);
+            for(let i =0; i <2; ++i) {
+              const data = await res.data; // data should cache the result for subsequent calls (is it in the specs?)
+
+              assert.equal(data.length, SIZE);
+              assert.instanceOf(data, Buffer);
+            }
+          });
+
+          it("should implement the text interface", async function() {
+            const res = await gp.get(BASE+'/html');
+            for(let i =0; i <2; ++i) {
+              const text = await res.text; // data should cache the result for subsequent calls (is it in the specs?)
+
+              assert.equal(typeof text, "string");
+              assert.isAbove(text.length, 0);
+            }
+          });
+
+          it("should implement the json interface", async function() {
+            const res = await gp.get(BASE+'/json');
+            for(let i =0; i <2; ++i) {
+              const json = await res.json; // data should cache the result for subsequent calls (is it in the specs?)
+
+              assert.equal(typeof json, "object");
+            }
           });
 
           it("should stream", function() {
@@ -64,8 +98,9 @@ describe("module", function() {
             return gp.get(BASE+'/redirect/'+REDIRECTS)
               .then((res) => new Promise(function(resolve, reject) {
                 let length = 0;
-                res.on('data', (chunk) => length += chunk.length);
-                res.on('end', () => {
+                res._node_res.on('error', (err) => reject(err));
+                res._node_res.on('data', (chunk) => length += chunk.length);
+                res._node_res.on('end', () => {
                   assert.equal(res.statusCode, 200);
                   assert.equal(length, res.headers['content-length']);
                   resolve();
@@ -102,14 +137,20 @@ describe("module", function() {
               .catch((err) => { assert.equal(err.response.statusCode, 101); })
           });
 
+          it("should honor the failOnError option", function() {
+            return gp.get(BASE+'/status/418', { failOnError: false  })
+              .then((res) => { assert.equal(res.statusCode, 418); });
+          });
+
           it("should support chunked encoding", function() {
             const SIZE = 2048;
 
             return gp.get(BASE+'/stream-bytes/'+SIZE)
               .then((res) => new Promise(function(resolve, reject) {
                 let length = 0;
-                res.on('data', (chunk) => length += chunk.length);
-                res.on('end', () => {
+                res._node_res.on('error', (err) => reject(err));
+                res._node_res.on('data', (chunk) => length += chunk.length);
+                res._node_res.on('end', () => {
                   assert.equal(res.statusCode, 200);
                   assert.equal(length, SIZE);
                   resolve();
@@ -157,7 +198,70 @@ describe("module", function() {
           if (semver.satisfies(process.version, '>= 7.6.0')) {
             require("./extra/async.js")(BASE, gp);
           }
-          
+
+        });
+
+        describe('POST', () => {
+
+          it('should post raw strings using the stream interface', async () => {
+            const req = gp.request.post(BASE+'/post');
+
+            req.write(TEXT);
+            const res = await req.end();
+            //res.setEncoding('utf8');
+
+            const payload = await res.json;
+
+            assert.equal(payload.data, TEXT);
+          });
+
+          it('should implement the json interface', async () => {
+            const MESSAGE = {
+              hello: "&world !",
+              answer: 42,
+            };
+
+            const res = await gp.request.post(BASE+'/post')
+              .json(MESSAGE);
+
+            const payload = await res.json;
+
+            assert.deepEqual(payload.json, MESSAGE);
+            assert.equal(payload.headers["Content-Type"][0], "application/json");
+          });
+
+          it('should implement the form interface (multipart/form-data)', async () => {
+            const MESSAGE = {
+              hello: [ "&world !" ], // The arrays are here because httpbingo always returns form value in arrays
+              answer: [ "42" ],
+            };
+
+            const res = await gp.request.post(/*"http://localhost:1234"/*/BASE+'/post', { failOnError: false })
+              .form(MESSAGE);
+
+            const payload = await res.json;
+
+            assert.equal(res.statusCode, 200);
+            assert.deepEqual(payload.form, MESSAGE);
+            assert.match(payload.headers["Content-Type"][0], /multipart\/form-data; boundary=/);
+          });
+
+          it('should implement the data interface (application/x-www-form-urlencoded)', async () => {
+            const MESSAGE = {
+              hello: [ "&world !" ], // The arrays are here because httpbingo always returns form value in arrays
+              answer: [ "42" ],
+            };
+
+            const res = await gp.request.post(BASE+'/post', { failOnError: false })
+              .data(MESSAGE);
+
+            const payload = await res.json;
+
+            assert.equal(res.statusCode, 200);
+            assert.deepEqual(payload.form, MESSAGE);
+            assert.equal(payload.headers["Content-Type"][0], "application/x-www-form-urlencoded");
+          });
+
         });
       });
     }
