@@ -36,9 +36,9 @@ describe("module", function() {
             return gp.get(BASE+'/encoding/utf8')
               .then((res) => new Promise(function(resolve, reject) {
 
-                res._node_res.on('error', (err) => reject(err));
-                res._node_res.on('data', (chunk) => { buffer+=chunk; });
-                res._node_res.on('end', () => resolve());
+                res._stream.on('error', (err) => reject(err));
+                res._stream.on('data', (chunk) => { buffer+=chunk; });
+                res._stream.on('end', () => resolve());
               }))
               .then(() => {
                 assert.isAbove(buffer.length, 0);
@@ -91,21 +91,15 @@ describe("module", function() {
               }));
           });
 
-          it("should follow redirects", function() {
+          it("should follow redirects", async function() {
             const REDIRECTS = 5;
             this.timeout(REDIRECTS*HTTP_SERVER_TIMEOUT);
 
-            return gp.get(BASE+'/redirect/'+REDIRECTS)
-              .then((res) => new Promise(function(resolve, reject) {
-                let length = 0;
-                res._node_res.on('error', (err) => reject(err));
-                res._node_res.on('data', (chunk) => length += chunk.length);
-                res._node_res.on('end', () => {
-                  assert.equal(res.statusCode, 200);
-                  assert.equal(length, res.headers['content-length']);
-                  resolve();
-                });
-              }));
+            const res = await gp.get(BASE+'/redirect/'+REDIRECTS);
+            const json = await res.json;
+
+            assert.equal(res.statusCode, 200);
+            assert.match(json.url, /\/get$/);
           });
 
           it("should limit redirects", function() {
@@ -184,6 +178,13 @@ describe("module", function() {
 
                 assert.equal(length, SIZE);
               }));
+          });
+
+          it("should accepts gzip-encoded responses", async function() {
+            const res = await  gp.get(BASE+'/gzip');
+            const json = await res.json;
+
+            assert.include(json.headers['Accept-Encoding'][0].split(/,\s*/), "gzip");
           });
 
           it("should reject non-existant hosts", function(done) {
