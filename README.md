@@ -28,14 +28,14 @@ when the next chuck of data arrives or when the stream is exhausted
 
 The _consumer_ interface integrates nicely with ECMAScript 2017 asynchronous functions (async/await) as well as with bluebird coroutines (see examples below).
 
-## Usage
+## Basic usage
 
     const gp = require('getpro');
     
     // Stream interface
     const fs = require('fs');
     
-    gp.get('http://httpbin.org/encoding/utf8')
+    gp.get('http://httpbingo.org/encoding/utf8')
       .then((res) => {
         const output = fs.createWriteStream('/tmp/utf8');
         res.pipe(output);
@@ -43,7 +43,7 @@ The _consumer_ interface integrates nicely with ECMAScript 2017 asynchronous fun
       
     // Consumer interface (bluebird coroutine)
     const Promise = require('bluebird');
-    gp.get('http://httpbin.org/encoding/utf8')
+    gp.get('http://httpbingo.org/encoding/utf8')
       .then(Promise.coroutine(function*(res) {
         let chunk = null;
 
@@ -54,7 +54,7 @@ The _consumer_ interface integrates nicely with ECMAScript 2017 asynchronous fun
 
       
     // Consumer interface (ECMAScript 2017 (ECMA-262) async/await)
-    gp.get('http://httpbin.org/encoding/utf8')
+    gp.get('http://httpbing0.org/encoding/utf8')
       .then(async function (res) {
         let chunk = null;
 
@@ -63,7 +63,30 @@ The _consumer_ interface integrates nicely with ECMAScript 2017 asynchronous fun
         };
       });
 
+## Advanced usage
+
+The advanced interface available through the `request` object allows greater control on the request.
+This is especially usefull for requests with a body (like the POST request):
+
+    const { request } = require('getpro');
     
+    // Stream interface
+    const fs = require('fs');
+    
+    request.get('http://httpbin.org/encoding/utf8')
+      .setHeader("accept-encoding", "deflate")
+      .then((res) => {
+        const output = fs.createWriteStream('/tmp/utf8');
+        res.pipe(output);
+      });
+
+    request.post('http://httpbin.org/post')
+      .json({some: "data"})
+      .then((res) => {
+        const output = fs.createWriteStream('/tmp/utf8');
+        res.pipe(output);
+      });
+
 
 ## Node version
 Requires NodeJS >= v10.0
