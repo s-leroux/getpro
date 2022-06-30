@@ -5,7 +5,7 @@ A simple promise-based wrapper arround NodeJS to download files using
 http/http.
 
 
-[![Build Status](https://travis-ci.org/s-leroux/getpro.png?branch=master)](https://travis-ci.org/s-leroux/getpro)
+![Build Status](https://github.com/s-leroux/getpro/actions/workflows/npm-test.yml/badge.svg)
 
 ## Installation
 
