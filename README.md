@@ -16,7 +16,6 @@ http/http.
 `getpro` is designed for no-caching asynchronous promise-oriented file download
 over http/https.
 
-It (currently?) only supports the GET method.
 
 * promise-oriented
 * very little dependencies
@@ -83,20 +82,20 @@ This is especially usefull for requests with a body (like the POST request):
     request.post('http://httpbin.org/post')
       .json({some: "data"})
       .then((res) => {
-        const output = fs.createWriteStream('/tmp/utf8');
+        const output = fs.createWriteStream('/tmp/out.json');
         res.pipe(output);
       });
 
 
 ## Node version
-Requires NodeJS >= v10.0
+Requires NodeJS >= v12.0
 Tested with v12.0 and v14.15
  
 ## License 
 
 (The MIT License)
 
-Copyright (c) 2018 [Sylvain Leroux](mailto:sylvain@chicoree.fr)
+Copyright (c) 2018-2022 [Sylvain Leroux](mailto:sylvain@chicoree.fr)
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
