@@ -53,7 +53,7 @@ The _consumer_ interface integrates nicely with ECMAScript 2017 asynchronous fun
 
       
     // Consumer interface (ECMAScript 2017 (ECMA-262) async/await)
-    gp.get('http://httpbing0.org/encoding/utf8')
+    gp.get('http://httpbingo.org/encoding/utf8')
       .then(async function (res) {
         let chunk = null;
 
@@ -72,14 +72,14 @@ This is especially usefull for requests with a body (like the POST request):
     // Stream interface
     const fs = require('fs');
     
-    request.get('http://httpbin.org/encoding/utf8')
+    request.get('http://httpbingo.org/encoding/utf8')
       .setHeader("accept-encoding", "deflate")
       .then((res) => {
         const output = fs.createWriteStream('/tmp/utf8');
         res.pipe(output);
       });
 
-    request.post('http://httpbin.org/post')
+    request.post('http://httpbingo.org/post')
       .json({some: "data"})
       .then((res) => {
         const output = fs.createWriteStream('/tmp/out.json');
