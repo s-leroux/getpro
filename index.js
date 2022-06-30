@@ -1,1 +1,2 @@
-module.exports = require('./lib/getpro');
+"use strict";
+module.exports = require("./lib/getpro");

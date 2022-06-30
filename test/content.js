@@ -1,3 +1,4 @@
+"use strict";
 const assert = require("chai").assert;
 
 const fs = require("fs");
@@ -17,19 +18,19 @@ describe("Content", () => {
   describe("Form", () => {
 
     it("Should create forms", async () => {
-      const form = await createFormStream(FORM);
+      /*const form =*/ await createFormStream(FORM);
     });
 
     it("Should be a readable stream", async () => {
       const form = await createFormStream(FORM);
 
       const str = form.read(16*1024);
-      assert.equal(str, 'hello=%26+world&a=1&b=2');
+      assert.equal(str, "hello=%26+world&a=1&b=2");
     });
 
     it("Should pipe to a writable stream", async () => {
       const form = await createFormStream(FORM);
-      const out = fs.createWriteStream('/tmp/tmp');
+      const out = fs.createWriteStream("/tmp/tmp");
 
       form.pipe(out);
     });
@@ -39,7 +40,7 @@ describe("Content", () => {
   describe("Multipart", () => {
 
     it("Should create forms", async () => {
-      const form = await createMultipartStream(FORM);
+      /*const form =*/ await createMultipartStream(FORM);
     });
 
     it("Should be a readable stream", async () => {
@@ -68,7 +69,7 @@ describe("Content", () => {
 
     it("Should pipe to a writable stream", async () => {
       const form = await createMultipartStream(FORM);
-      const out = fs.createWriteStream('/tmp/tmp');
+      const out = fs.createWriteStream("/tmp/tmp");
 
       form.pipe(out);
     });

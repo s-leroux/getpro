@@ -1,5 +1,6 @@
+"use strict";
 const debug = require("debug")("getpro:async");
-const assert = require('chai').assert;
+const assert = require("chai").assert;
 
 module.exports = function(BASE, gp) {
 
@@ -8,18 +9,18 @@ module.exports = function(BASE, gp) {
       const SIZE = 2048;
       let length = 0;
 
-      return gp.get(BASE+'/stream-bytes/'+SIZE)
+      return gp.get(BASE+"/stream-bytes/"+SIZE)
         .then(async function (res) {
           let chunk = null;
 
-          while (chunk = await res.consume()) {
+          while ((chunk = await res.consume())) {
             length += chunk.length;
             debug("chunk len=%d", chunk.length);
-          };
+          }
           
           assert.equal(length, SIZE);
         });
-    })
-  })
+    });
+  });
 
-}
+};
