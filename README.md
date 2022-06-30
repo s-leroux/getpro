@@ -5,7 +5,7 @@ A simple promise-based wrapper arround NodeJS to download files using
 http/http.
 
 
-[![Build Status](https://travis-ci.org/s-leroux/getpro.png?branch=master)](https://travis-ci.org/s-leroux/getpro)
+[![Build Status](https://github.com/s-leroux/getpro/actions/workflows/npm-test.yml/badge.svg)](https://github.com/s-leroux/getpro/actions/workflows/npm-test.yml)
 
 ## Installation
 
@@ -67,7 +67,7 @@ The _consumer_ interface integrates nicely with ECMAScript 2017 asynchronous fun
 
 ## Node version
 Requires NodeJS >= v10.0
-Tested with v10.0 and v14.15
+Tested with v12.0 and v14.15
  
 ## License 
 
