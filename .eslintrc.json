@@ -1,0 +1,43 @@
+{
+    "env": {
+        "commonjs": true,
+        "es2021": true,
+        "node": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": 12
+    },
+    "plugins": [
+      "jsdoc"
+    ],
+    "rules": {
+        "jsdoc/require-asterisk-prefix": 1,
+        "jsdoc/check-alignment": 1,
+
+        "no-constant-condition": [
+          "error",
+          { "checkLoops": false }
+        ],
+        "strict": [
+            "error",
+            "global"
+        ],
+        "indent": [
+            "error",
+            2
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "quotes": [
+            "error",
+            "double"
+        ],
+        "semi": [
+            "error",
+            "always"
+        ]
+    }
+}
