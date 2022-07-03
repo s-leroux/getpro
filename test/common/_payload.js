@@ -19,6 +19,15 @@ module.exports = function(endpoint, method) {
     assert.equal(payload.data, data.TEXT);
   });
 
+  it("should implement the text interface", async () => {
+    const res = await method(endpoint)
+      .text(data.TEXT);;
+
+    const payload = await res.json;
+
+    assert.equal(payload.data, data.TEXT);
+  });
+
   it("should implement the json interface", async () => {
     const MESSAGE = {
       hello: "&world !",
