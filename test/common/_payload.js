@@ -21,7 +21,7 @@ module.exports = function(endpoint, method) {
 
   it("should implement the text interface", async () => {
     const res = await method(endpoint)
-      .text(data.TEXT);;
+      .text(data.TEXT);
 
     const payload = await res.json;
 
