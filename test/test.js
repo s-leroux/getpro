@@ -165,6 +165,31 @@ describe("module", function() {
             }));
         });
 
+        it("should implement consume (await)", async function() {
+          const res = await gp.get(BASE+"/encoding/utf8");
+
+          let chunk = null;
+          while ((chunk = await res.consume())) {
+            debug("chunk len=%d", chunk.length);
+          }
+        });
+
+        it("should implement the flush interface", async function() {
+          const res = await gp.get(BASE+"/encoding/utf8");
+          await res.flush();
+
+          assert.isUndefined(await res.consume());
+        });
+
+        it("allow mixing consume and flush", async function() {
+          const res = await gp.get(BASE+"/encoding/utf8");
+          const chunk = await res.consume();
+          await res.flush();
+
+          assert.isDefined(chunk);
+          assert.isUndefined(await res.consume());
+        });
+
         it("should consume chunked encoding", function() {
           const SIZE = 2048;
           let length = 0;
