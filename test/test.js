@@ -6,11 +6,13 @@ const MemoryStream = require("memorystream");
 const assert = require("chai").assert;
 const semver = require("semver");
 
+const data = require("./data.js");
+
 /* temporary patch for https://github.com/chaijs/chai/issues/1116 */
 assert.fail = require("assert").fail;
 
 const HTTP_TEST_SERVER = process.env.HTTP_TEST_SERVER || "httpbingo.org";
-const HTTP_SERVER_TIMEOUT = process.env.HTTP_SERVER_TIMEOUT || 5000;
+const HTTP_SERVER_TIMEOUT = +process.env.HTTP_SERVER_TIMEOUT || 5000;
 
 describe("module", function() {
   let gp = null;
@@ -25,11 +27,10 @@ describe("module", function() {
 
   for(let protocol of ["http", "https"]) {
     describe(protocol.toUpperCase(), function() {
+      this.timeout(HTTP_SERVER_TIMEOUT); // extends timeout since we are using an external service
       const BASE = protocol + "://" + HTTP_TEST_SERVER;
-      const TEXT = "Some random UTF-8 string ❤️ ";
 
       describe("GET", function() {
-        this.timeout(HTTP_SERVER_TIMEOUT); // extends timeout since we are using an external service
         gp = require("../index.js");
 
         it("should load text", function() {
@@ -203,68 +204,26 @@ describe("module", function() {
 
       });
 
-      describe("POST", () => {
-
-        it("should post raw strings using the stream interface", async () => {
-          const req = gp.request.post(BASE+"/post");
-
-          req.write(TEXT);
-          const res = await req.end();
-          //res.setEncoding('utf8');
-
-          const payload = await res.json;
-
-          assert.equal(payload.data, TEXT);
-        });
-
-        it("should implement the json interface", async () => {
-          const MESSAGE = {
-            hello: "&world !",
-            answer: 42,
-          };
-
-          const res = await gp.request.post(BASE+"/post")
-            .json(MESSAGE);
-
-          const payload = await res.json;
-
-          assert.deepEqual(payload.json, MESSAGE);
-          assert.equal(payload.headers["Content-Type"][0], "application/json");
-        });
-
-        it("should implement the form interface (multipart/form-data)", async () => {
-          const MESSAGE = {
-            hello: [ "&world !" ], // The arrays are here because httpbingo always returns form value in arrays
-            answer: [ "42" ],
-          };
-
-          const res = await gp.request.post(/*"http://localhost:1234"/*/BASE+"/post", { failOnError: false })
-            .form(MESSAGE);
-
-          const payload = await res.json;
-
-          assert.equal(res.statusCode, 200);
-          assert.deepEqual(payload.form, MESSAGE);
-          assert.match(payload.headers["Content-Type"][0], /multipart\/form-data; boundary=/);
-        });
-
-        it("should implement the data interface (application/x-www-form-urlencoded)", async () => {
-          const MESSAGE = {
-            hello: [ "&world !" ], // The arrays are here because httpbingo always returns form value in arrays
-            answer: [ "42" ],
-          };
-
-          const res = await gp.request.post(BASE+"/post", { failOnError: false })
-            .data(MESSAGE);
-
-          const payload = await res.json;
-
-          assert.equal(res.statusCode, 200);
-          assert.deepEqual(payload.form, MESSAGE);
-          assert.equal(payload.headers["Content-Type"][0], "application/x-www-form-urlencoded");
-        });
-
+      describe("DELETE", () => {
+        require("./common/_payload.js")(BASE+"/delete",gp.request.delete);
       });
+
+      describe("HEAD", () => {
+        require("./common/_no_payload.js")(BASE+"/head",gp.request.head);
+      });
+
+      describe("PATCH", () => {
+        require("./common/_payload.js")(BASE+"/patch",gp.request.patch);
+      });
+
+      describe("POST", () => {
+        require("./common/_payload.js")(BASE+"/post",gp.request.post);
+      });
+
+      describe("PUT", () => {
+        require("./common/_payload.js")(BASE+"/put",gp.request.put);
+      });
+
     });
   }
 });
