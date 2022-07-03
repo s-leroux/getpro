@@ -209,7 +209,7 @@ describe("module", function() {
       });
 
       describe("HEAD", () => {
-        require("./common/_payload.js")(BASE+"/head",gp.request.head);
+        require("./common/_no_payload.js")(BASE+"/head",gp.request.head);
       });
 
       describe("PATCH", () => {
