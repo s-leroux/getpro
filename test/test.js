@@ -80,7 +80,7 @@ describe("module", function() {
         });
 
         it("should stream", function() {
-          const SIZE = 2048;
+          const SIZE = 1024*96;
           const memStream = MemoryStream.createWriteStream();
 
           return gp.get(BASE+"/stream-bytes/"+SIZE)
@@ -94,8 +94,7 @@ describe("module", function() {
         });
 
         it("should trigger events", async function() {
-          const SIZE = 1024*128;
-          const memStream = MemoryStream.createWriteStream();
+          const SIZE = 1024*96;
           
           let _resolve = null;
           let _reject = null;
@@ -103,10 +102,16 @@ describe("module", function() {
           const res = await gp.get(BASE+"/stream-bytes/"+SIZE);
           let len = 0;
 
-          res.on('end', () => {
-            _resolve();
+          res.on("end", () => {
+            try {
+              assert.equal(len, SIZE);
+              _resolve();
+            }
+            catch(err) {
+              _reject(err);
+            }
           });
-          res.on('data', (chunk) => { len += chunk.length; console.log(len); });
+          res.on("data", (chunk) => { len += chunk.length; });
           await p;
         });
 
@@ -161,9 +166,9 @@ describe("module", function() {
           return gp.get(BASE+"/stream-bytes/"+SIZE)
             .then((res) => new Promise(function(resolve, reject) {
               let length = 0;
-              res._node_res.on("error", (err) => reject(err));
-              res._node_res.on("data", (chunk) => length += chunk.length);
-              res._node_res.on("end", () => {
+              res.on("error", (err) => reject(err));
+              res.on("data", (chunk) => length += chunk.length);
+              res.on("end", () => {
                 assert.equal(res.statusCode, 200);
                 assert.equal(length, SIZE);
                 resolve();
