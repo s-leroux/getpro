@@ -93,6 +93,23 @@ describe("module", function() {
             }));
         });
 
+        it("should trigger events", async function() {
+          const SIZE = 1024*128;
+          const memStream = MemoryStream.createWriteStream();
+          
+          let _resolve = null;
+          let _reject = null;
+          const p = new Promise((resolve, reject) => { _resolve = resolve; _reject = reject; });
+          const res = await gp.get(BASE+"/stream-bytes/"+SIZE);
+          let len = 0;
+
+          res.on('end', () => {
+            _resolve();
+          });
+          res.on('data', (chunk) => { len += chunk.length; console.log(len); });
+          await p;
+        });
+
         it("should follow redirects", async function() {
           const REDIRECTS = 5;
           this.timeout(REDIRECTS*HTTP_SERVER_TIMEOUT);
