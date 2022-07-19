@@ -143,6 +143,17 @@ describe("module", function() {
             .catch((err) => { debug(err); assert.equal(err.response.statusCode, 418); });
         });
 
+        it("should reject 4xx with an HttpStatusError", async function() {
+          try {
+            await gp.get(BASE+"/status/404");
+            assert.fail("Not supposed to succeed");
+          }
+          catch(err) {
+            assert.equal(err.response.statusCode, 404);
+            assert.instanceOf(err, gp.HttpStatusError);
+          }
+        });
+
         it("should reject 5xx", function() {
           return gp.get(BASE+"/status/500")
             .then(() => { assert.fail("Not supposed to succeed"); })
