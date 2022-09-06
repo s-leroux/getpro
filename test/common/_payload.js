@@ -77,5 +77,28 @@ module.exports = function(endpoint, method) {
     assert.equal(payload.headers["Content-Type"][0], "application/x-www-form-urlencoded");
   });
 
+  it("should reject nested objects in form data", async () => {
+    const MESSAGE = {
+      nested: {
+      },
+    };
+
+    let ok = false;
+    try {
+      const res = await method(endpoint, { failOnError: false })
+        .data(MESSAGE);
+
+      const payload = await res.json;
+      ok = true;
+    }
+    catch(err) {
+      assert.equal(err.message, "Nested data structure are not supported in forms");
+      // ok
+    }
+    if (ok) {
+      assert.fail("Should have thrown an error");
+    }
+  });
+
 
 };

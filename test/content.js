@@ -52,14 +52,19 @@ describe("Content", () => {
     it("Should throw an error in case of nested objects", async () => {
       const form = await createFormStream(FORM_WITH_OBJECT);
 
+      let ok = false;
       try {
         await form.readAsync(16*1024);
         form.read(16*1024);
 
-        assert.fail("Should have thrown an error");
+        ok = true;
       }
       catch(err) {
+        assert.equal(err.message, "Nested data structure are not supported in forms");
         // ok
+      }
+      if (ok) {
+        assert.fail("Should have thrown an error");
       }
     });
 
@@ -146,6 +151,25 @@ describe("Content", () => {
         "1" + "\r\n" +
         "----BOUNDARY--\r\n"
       );
+    });
+
+    it("Should throw an error in case of nested objects", async () => {
+      const form = await createMultipartStream(FORM_WITH_OBJECT);
+
+      let ok = false;
+      try {
+        await form.readAsync(16*1024);
+        form.read(16*1024);
+
+        ok = true;
+      }
+      catch(err) {
+        assert.equal(err.message, "Nested data structure are not supported in forms");
+        // ok
+      }
+      if (ok) {
+        assert.fail("Should have thrown an error");
+      }
     });
 
     it("Should pipe to a writable stream", async () => {
